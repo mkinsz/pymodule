@@ -1,0 +1,130 @@
+//外部传入的值 isOrder,orderInfo.userEmail//
+        var overDeadTime =1;//1表示已经超过了时间
+        var isOrder = 1;//1是已经订了，0是还没订
+        var badgeNumber = "0512004610";
+
+        $(function () {
+            //预订成功状态
+            function success() {
+                //背景色是橙色
+                $("#header").css("background-color", "#ff944c");
+                $("#description").css("background-color", "#ff944c");
+                $("#pic").attr("src", "/kmoa/js/mealOrder/image/ordersuccess.png");
+                //为今日晚餐未预订
+                $("#descriptionFont").html("今日晚餐已经预订成功");
+                //按钮是取消预订
+                $("#btn").html("取消预订");
+                $("#btn").css("background-color", "#ff944c");
+            }
+
+            function error() {
+                //背景色是蓝色
+                $("#header").css("background-color", "#009be1");
+                $("#description").css("background-color", "#009be1");
+                //今日晚餐已经预订成功
+                $("#descriptionFont").html("今日晚餐未预订");
+                //按钮是预订
+                $("#btn").html("预订");
+                //按钮背景色
+                $("#btn").css("background-color", "#009be1");
+            }
+
+            //截止时间已过
+            if (overDeadTime == 1 && isOrder == 1) {//表示已经订过餐且时间过了
+                success();
+                $("#btn").html("不可取消（有效操作时间段为：09:00-14:00）");
+                $("#btn").attr("disabled", true);
+                $("#btn").css("background-color", "#7C7878");
+            }
+            if (overDeadTime == 1 && isOrder == 0) {//表示还没订餐时间却过了
+                error();
+                $("#btn").html("不可预订（有效操作时间段为：09:00-14:00）");
+                $("#btn").attr("disabled", true);
+                $("#btn").css("background-color", "#7C7878");
+
+            }
+            if (overDeadTime == 0 && isOrder == 1) {//表示截止时间未过,已经预订过了
+                success();
+            }
+            if (overDeadTime == 0 && isOrder == 0) {//截止时间未过表示还没有预订
+                error();
+            }
+
+            //是否有问卷调查
+            var qMsg = '';
+            if(qMsg != undefined && qMsg != null && qMsg != ''){
+                $("#btn").attr("disabled", true);
+                $("#btn").css("background-color", "#7C7878");
+            }
+        });
+        //点击函数
+        function cancleAndOrder() {
+            if (isOrder == 1) { //1是已经订了
+                var isOrdervar = 0; //参数应该是0，取消订
+                var opTip = "您当前要取消订餐，确定？";
+            } else if (isOrder == 0) { //0是还没订
+                var isOrdervar = 1; //参数应该是1,订
+                var opTip = "您预订了今日晚餐，请按公司规定的时间前去就餐，预定后未前去就餐，也未能及时取消订餐的，当日晚餐产生的费用将由订
+餐者承担。友情提示！祝您用餐愉快！";
+            }
+            $.confirm({
+                'title': '提示',
+                'message': opTip,
+                'buttons': {
+                    '确定': {
+                        'class': 'blue',
+                        'action': function () {
+                            $.ajax({
+                                url: '/kmoa/mealOrder/orderOrCancel.do',
+                                data: {
+                                    clientType: "PC",
+                                    userEmail: "hezhijun@kedacom.com",
+                                    badgeNumber: "0512004610",
+                                    fullname: "何枳君",
+                                    isOrder: isOrdervar
+                                },
+                                type: 'post',
+                                cache: false,
+                                async: true,
+                                dataType: 'json',
+                                complete: function (msg) {
+                                    var result = msg.responseJSON;
+                                    if (result.sid && result.sid == 1) {
+                                        window.location.reload();
+                                    } else {
+                                        layer.open({
+                                            content: result.desc,
+                                            style: 'background-color:#ffffff; color:#fff; border:none;',
+                                            time: 0,
+                                            yes: function () {
+                                                window.location.reload();
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    },
+                    '取消': {
+                        'class': 'gray',
+                        'action': function () {
+                        }
+                    }
+                }
+            });
+        }
+        //跳转问卷调查页面
+        function goQuestionnaire(url) {
+            $.ajax({
+                type: 'post',
+                url: url,
+                showWaitting: true,
+                success: function (data) {
+                    if (data.result == 1) {
+                        window.location.href = data.data;
+                    } else {
+                        $.ligerDialog.warn(data.message);
+                    }
+                }
+            });
+        }
