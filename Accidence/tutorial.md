@@ -15,7 +15,7 @@
 
 ## Install the packages
 
-> python -m pip install matplotelib
+> python -m pip install ***
 > py -3 -m pip install ***
 
 ## Update pip
