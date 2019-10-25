@@ -1,8 +1,3 @@
-# msg = 'Hello World!'
-# print(msg)
-# msg.capitalize()
-# msg.split()
-
 import matplotlib.pyplot as plt
 import numpy as np
 
