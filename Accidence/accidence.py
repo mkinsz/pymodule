@@ -75,31 +75,33 @@ from bs4 import BeautifulSoup
 # postData = urllib.parse.urlencode(post)
 # print(postData)
 
-import os
-import sys
-import re
+# -------------------------- IO Operate ----------------------------
+# import os
+# import sys
+# import re
 
-print(os.path.abspath(__file__))
-print(os.getcwd())
+# print(os.path.abspath(__file__))
+# print(os.getcwd())
 
-target = os.path.dirname(os.path.abspath(__file__))
-os.chdir(target)
-f = open('return.txt', 'rb')
-try:
-    ret = f.read().decode('utf-8')
+# target = os.path.dirname(os.path.abspath(__file__))
+# os.chdir(target)
+# f = open('return.txt', 'rb')
+# try:
+#     ret = f.read().decode('utf-8')
 
-    # pattern = re.compile(r'badgeNumber\s?=\s?\"(\w+)\"', re.M)
-    pattern = re.compile(r'isOrder\s?=\s?(\d+)', re.M)
-    match = pattern.match(ret)
-    print(match)
-    if match:
-        print('search...')
-        print(match.group(1))
+#     # pattern = re.compile(r'badgeNumber\s?=\s?\"(\w+)\"', re.M)
+#     pattern = re.compile(r'isOrder\s?=\s?(\d+)', re.M)
+#     match = pattern.match(ret)
+#     print(match)
+#     if match:
+#         print('search...')
+#         print(match.group(1))
 
-except Exception as e:
-    print(e)
-finally:
-    f.close()
+# except Exception as e:
+#     print(e)
+# finally:
+#     f.close()
+# ------------------------------------------------------------------
 
 # with open('return.txt', 'r', encoding='utf-8') as f:
 #     ret = f.read()
@@ -129,3 +131,20 @@ finally:
 # if match:
 #     print('search...')
 #     print(match.group(1), match.group(2))
+
+# --------------------------------- Image --------------------------------
+
+
+
+def gethtml():
+    url = 'https://www.meizitu.com/a/list_1_1.html'
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.70 Safari/537.36'
+    }
+    request = urllib.request.Request(url=url, headers=headers)
+    response = urllib.request.urlopen(request)
+    html = response.read()
+    response.close()
+    print(html)
+
+gethtml()
