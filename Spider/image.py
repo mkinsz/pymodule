@@ -76,9 +76,6 @@ def download_img_from_page(t, page_url):
     dir_html = get_html(page_url)
     dir_soup = get_soup(dir_html)
 
-    print(dir_soup)
-    print()
-
     # 得到当前页面的图片
     main_image = dir_soup.findAll(name='div', attrs={'class':'main-image'})
     if None != main_image:
