@@ -1,7 +1,9 @@
 # coding: utf-8
 
+import sys
 import json
 import os.path
+import datetime
 from pickle import dump, load
 from time import sleep, time
 
@@ -11,7 +13,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 class AutoTicket:
-    def __init__(self):
+    def __init__(self, period, price, date, real_name, nick_name, ticket_num, damai_url, target_url, browser):
         self.period = period # 场次序号优先级
         self.price = price  # 票价序号优先级
         self.date = date    # 日期选择
@@ -29,6 +31,15 @@ class AutoTicket:
         self.total_wait_time = 3 # 页面元素加载总等待时间
         self.refresh_wait_time = 0.3 # 页面元素等待刷新时间
         self.intersect_wait_time = 0.5 # 间隔等待时间，防止速度过快导致问题
+
+        if self.target_url.find("detail.damai.cn") != -1:
+            self.type = 1
+        elif self.target_url.find("piao.damai.cn") != -1:
+            self.type = 2
+        else:
+            self.type = 0
+            raise Exception("***Error:Unsupported Target Url Format:{}***".format(self.target_url))
+            self.driver.quit()
 
     def get_cookie(self):
         self.driver.get(self.damai_url)
@@ -102,3 +113,28 @@ class AutoTicket:
             self.status = 0
             raise Exception("***错误：登录失败,请检查配置文件昵称或删除cookie.pkl后重试***")
             self.driver.quit()
+
+if __name__ == '__main__':
+    # startTime = datetime.datetime(2019, 11, 29, 10, 14, 30)  #定时功能：2019-9-25 09:17:07秒开抢
+    # print('抢票程序还未开始...')
+    # while datetime.datetime.now() < startTime:
+    #     sleep(1)
+    # print('开始进入抢票 %s' % startTime)
+    # print('正在执行...')
+
+    script = os.path.abspath(sys.argv[0])
+    target = os.path.dirname(script)
+    os.chdir(target)
+    print(script, target, os.path.abspath(os.curdir))
+
+    try:
+        with open('config.json', 'r', encoding='utf-8') as f:
+                    config = json.loads(f.read())
+                # params: 场次优先级，票价优先级，日期， 实名者序号, 用户昵称， 购买票数， 官网网址， 目标网址， 浏览器
+        con = AutoTicket(config['sess'], config['price'], config['date'], config['real_name'], config['nick_name'], config['ticket_num'],
+                      config['damai_url'], config['target_url'], config['browser'])
+    except Exception as e:
+        print(e)
+        raise Exception("***错误：初始化失败，请检查配置文件***")
+
+    con.enter_concert();
